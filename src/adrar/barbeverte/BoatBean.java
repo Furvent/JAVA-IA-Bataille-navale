@@ -1,8 +1,9 @@
 package adrar.barbeverte;
 
-import java.awt.List;
+import java.util.ArrayList;
+import java.util.List;
 
-import adrar.barbeverte.enums.DirectionBean;
+import adrar.barbeverte.enums.Direction;
 
 public class BoatBean {
 
@@ -11,16 +12,19 @@ public class BoatBean {
 	// ===========================================================
 	private int size;
 	private PointBean originPoint;
-	private List touchedPointBeanList;
-	private DirectionBean directionBean;
+	private List<PointBean> pointBeanList;
+
+	private List<PointBean> touchedPointBeanList;
+	private Direction direction;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-	public BoatBean(int size, PointBean originPoint, DirectionBean directionBean) {
+	public BoatBean(int size, PointBean originPoint, Direction direction) {
 		this.size = size;
 		this.originPoint = originPoint;
-		this.directionBean = directionBean;
+		this.direction = direction;
+		touchedPointBeanList = new ArrayList<>();
 	}
 
 	// ===========================================================
@@ -42,26 +46,32 @@ public class BoatBean {
 		this.originPoint = originPoint;
 	}
 
-	public List getTouchedPointBeanList() {
+	public List<PointBean> getTouchedPointBeanList() {
 		return touchedPointBeanList;
 	}
 
-	public void setTouchedPointBeanList(List touchedPointBeanList) {
-		this.touchedPointBeanList = touchedPointBeanList;
+	public List<PointBean> getPointBeanList() {
+		return pointBeanList;
 	}
 
-	public DirectionBean getDirectionBean() {
-		return directionBean;
+	public Direction getDirectionBean() {
+		return direction;
 	}
 
-	public void setDirectionBean(DirectionBean directionBean) {
-		this.directionBean = directionBean;
+	public void setDirectionBean(Direction directionBean) {
+		direction = directionBean;
 	}
 
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	public boolean DoesItTouchAtThisPoint(PointBean point) {
 
+	/**
+	 * WIP TODO Lever exception
+	 * 
+	 * @param point
+	 */
+	public void takeDamageAtThisPoint(PointBean point) {
+		touchedPointBeanList.add(point);
 	}
 }

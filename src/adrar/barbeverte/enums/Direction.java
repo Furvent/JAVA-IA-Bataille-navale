@@ -1,6 +1,6 @@
 package adrar.barbeverte.enums;
 
-public enum DirectionBean {
+public enum Direction {
 	UP(0), RIGHT(1), DOWN(2), LEFT(3);
 
 	private int value;
@@ -9,7 +9,7 @@ public enum DirectionBean {
 		return value;
 	}
 
-	DirectionBean(int value) {
+	Direction(int value) {
 		this.value = value;
 	}
 }
