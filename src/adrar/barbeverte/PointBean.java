@@ -1,6 +1,6 @@
 package adrar.barbeverte;
 
-public class PointBean {
+public final class PointBean {
 
 	private int axeX;
 	private int axeY;
@@ -31,12 +31,12 @@ public class PointBean {
 		this.axeY = axeY;
 	}
 
-	public boolean isEqual(PointBean point) {
+	public boolean haveSamePosition(PointBean point) {
 		return point.getAxeX() == axeX && point.getAxeY() == axeY;
 	}
 
 	public String getPosDescription() {
-		return "x: " + axeX + "/y: " + axeY;
+		return "x:" + axeX + "-y:" + axeY;
 	}
 
 }

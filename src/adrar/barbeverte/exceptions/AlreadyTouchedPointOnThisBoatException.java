@@ -2,7 +2,7 @@ package adrar.barbeverte.exceptions;
 
 import adrar.barbeverte.BoatBean;
 
-public class AlreadyTouchedPointOnThisBoatException extends Exception {
+public final class AlreadyTouchedPointOnThisBoatException extends Exception {
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -16,6 +16,6 @@ public class AlreadyTouchedPointOnThisBoatException extends Exception {
 
 	public AlreadyTouchedPointOnThisBoatException(BoatBean boat) {
 		super(ERROR_MESSAGE + " size of " + boat.getSize() + " and positionned at point "
-				+ boat.getOriginPoint().getPosDescription());
+				+ boat.getListOfPointsDescription(boat.getPointBeanList()));
 	}
 }

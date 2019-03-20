@@ -3,7 +3,6 @@ package adrar.barbeverte;
 import java.util.ArrayList;
 import java.util.List;
 
-import adrar.barbeverte.enums.Direction;
 import adrar.barbeverte.exceptions.AlreadyTouchedPointOnThisBoatException;
 import adrar.barbeverte.exceptions.WrongPointOnBoatTouchedException;
 
@@ -12,40 +11,22 @@ public class BoatBean {
 	// ===========================================================
 	// Fields
 	// ===========================================================
-	private int size;
-	private PointBean originPoint;
 	private List<PointBean> pointBeanList;
-
 	private List<PointBean> touchedPointBeanList;
-	private Direction direction;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-	public BoatBean(int size, PointBean originPoint, Direction direction) {
-		this.size = size;
-		this.originPoint = originPoint;
-		this.direction = direction;
+	public BoatBean(List<PointBean> pointBeanList) {
 		touchedPointBeanList = new ArrayList<>();
+		this.pointBeanList = pointBeanList;
 	}
 
 	// ===========================================================
 	// Getter & Setter
 	// ===========================================================
 	public int getSize() {
-		return size;
-	}
-
-	public void setSize(int size) {
-		this.size = size;
-	}
-
-	public PointBean getOriginPoint() {
-		return originPoint;
-	}
-
-	public void setOriginPoint(PointBean originPoint) {
-		this.originPoint = originPoint;
+		return pointBeanList.size();
 	}
 
 	public List<PointBean> getTouchedPointBeanList() {
@@ -54,14 +35,6 @@ public class BoatBean {
 
 	public List<PointBean> getPointBeanList() {
 		return pointBeanList;
-	}
-
-	public Direction getDirectionBean() {
-		return direction;
-	}
-
-	public void setDirectionBean(Direction directionBean) {
-		direction = directionBean;
 	}
 
 	// ===========================================================
@@ -77,18 +50,27 @@ public class BoatBean {
 	 */
 	public void takeDamageAtThisPoint(PointBean point)
 			throws WrongPointOnBoatTouchedException, AlreadyTouchedPointOnThisBoatException {
-		if (isThisPointExistInPointList(point, pointBeanList)) {
+		if (!(isThisPointExistInAListOfPoint(point, pointBeanList))) {
 			throw new WrongPointOnBoatTouchedException(this);
-		} else if (isThisPointExistInPointList(point, touchedPointBeanList)) {
+		} else if (isThisPointExistInAListOfPoint(point, touchedPointBeanList)) {
 			throw new AlreadyTouchedPointOnThisBoatException(this);
 		} else {
 			touchedPointBeanList.add(point);
 		}
 	}
 
-	private boolean isThisPointExistInPointList(PointBean point, List<PointBean> list) {
+	public String getListOfPointsDescription(List<PointBean> list) {
+		String description = "";
+
+		for (PointBean point : list) {
+			description += " " + point.getPosDescription();
+		}
+		return description;
+	}
+
+	private boolean isThisPointExistInAListOfPoint(PointBean point, List<PointBean> list) {
 		for (PointBean boatPoint : list) {
-			if (boatPoint.equals(point)) {
+			if (boatPoint.haveSamePosition(point)) {
 				return true;
 			}
 		}

@@ -2,7 +2,7 @@ package adrar.barbeverte.exceptions;
 
 import adrar.barbeverte.BoatBean;
 
-public class WrongPointOnBoatTouchedException extends Exception {
+public final class WrongPointOnBoatTouchedException extends Exception {
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -15,7 +15,7 @@ public class WrongPointOnBoatTouchedException extends Exception {
 	private static final long serialVersionUID = 4L;
 
 	public WrongPointOnBoatTouchedException(BoatBean boat) {
-		super(ERROR_MESSAGE + " size of " + boat.getSize() + " and positionned at point "
-				+ boat.getOriginPoint().getPosDescription());
+		super(ERROR_MESSAGE + " size of " + boat.getSize() + " and positionned at points :"
+				+ boat.getListOfPointsDescription(boat.getPointBeanList()));
 	}
 }
