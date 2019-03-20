@@ -31,4 +31,12 @@ public class PointBean {
 		this.axeY = axeY;
 	}
 
+	public boolean isEqual(PointBean point) {
+		return point.getAxeX() == axeX && point.getAxeY() == axeY;
+	}
+
+	public String getPosDescription() {
+		return "x: " + axeX + "/y: " + axeY;
+	}
+
 }

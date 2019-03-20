@@ -1,0 +1,3 @@
+eclipse.preferences.version=1
+encoding//src/adrar/barbeverte/exceptions/AlreadyTouchedPointOnThisBoatException.java=UTF-8
+encoding//src/adrar/barbeverte/exceptions/WrongPointOnBoatTouchedException.java=UTF-8

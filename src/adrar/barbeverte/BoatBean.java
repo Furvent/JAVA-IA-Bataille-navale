@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adrar.barbeverte.enums.Direction;
+import adrar.barbeverte.exceptions.AlreadyTouchedPointOnThisBoatException;
+import adrar.barbeverte.exceptions.WrongPointOnBoatTouchedException;
 
 public class BoatBean {
 
@@ -67,11 +69,29 @@ public class BoatBean {
 	// ===========================================================
 
 	/**
-	 * WIP TODO Lever exception
-	 * 
+	 * Rajoute un point à la liste des points endommagés. Vérifie si ce point existe
+	 * bien dans le bateau, et vérifie aussi que le bateau ne soit pas déjà
+	 * endommagé à ce point là.
+	 *
 	 * @param point
 	 */
-	public void takeDamageAtThisPoint(PointBean point) {
-		touchedPointBeanList.add(point);
+	public void takeDamageAtThisPoint(PointBean point)
+			throws WrongPointOnBoatTouchedException, AlreadyTouchedPointOnThisBoatException {
+		if (isThisPointExistInPointList(point, pointBeanList)) {
+			throw new WrongPointOnBoatTouchedException(this);
+		} else if (isThisPointExistInPointList(point, touchedPointBeanList)) {
+			throw new AlreadyTouchedPointOnThisBoatException(this);
+		} else {
+			touchedPointBeanList.add(point);
+		}
+	}
+
+	private boolean isThisPointExistInPointList(PointBean point, List<PointBean> list) {
+		for (PointBean boatPoint : list) {
+			if (boatPoint.equals(point)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
