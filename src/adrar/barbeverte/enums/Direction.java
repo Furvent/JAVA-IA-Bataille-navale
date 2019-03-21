@@ -5,11 +5,32 @@ public enum Direction {
 
 	private int value;
 
+	Direction(int value) {
+		this.value = value;
+	}
+
 	public int getValue() {
 		return value;
 	}
 
-	Direction(int value) {
-		this.value = value;
+	public void nexDirection() {
+		switch (value) {
+		case 0:
+			value = 1;
+			break;
+		case 1:
+			value = 2;
+			break;
+		case 2:
+			value = 3;
+			break;
+		case 3:
+			value = 0;
+			break;
+		default:
+			value = 0;
+			break;
+		}
 	}
+
 }
