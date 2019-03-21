@@ -16,6 +16,6 @@ public final class AlreadyTouchedPointOnThisBoatException extends Exception {
 
 	public AlreadyTouchedPointOnThisBoatException(BoatBean boat) {
 		super(ERROR_MESSAGE + " size of " + boat.getSize() + " and positionned at point "
-				+ boat.getListOfPointsDescription(boat.getPointBeanList()));
+				+ boat.getListOfPointsDescription());
 	}
 }

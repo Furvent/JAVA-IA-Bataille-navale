@@ -1,7 +1,5 @@
 package adrar.barbeverte;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import adrar.barbeverte.exceptions.AlreadyTouchedPointOnThisBoatException;
@@ -17,8 +15,8 @@ public class BoatBean {
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-	public BoatBean(List<PointBean> pointBeanList) {
-		pointMap = new HashMap<>();
+	public BoatBean(Map<PointBean, Boolean> pointMap) {
+		this.pointMap = pointMap;
 	}
 
 	// ===========================================================
