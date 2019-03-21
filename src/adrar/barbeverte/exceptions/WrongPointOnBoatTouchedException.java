@@ -16,6 +16,6 @@ public final class WrongPointOnBoatTouchedException extends Exception {
 
 	public WrongPointOnBoatTouchedException(BoatBean boat) {
 		super(ERROR_MESSAGE + " size of " + boat.getSize() + " and positionned at points :"
-				+ boat.getListOfPointsDescription(boat.getPointBeanList()));
+				+ boat.getListOfPointsDescription());
 	}
 }
