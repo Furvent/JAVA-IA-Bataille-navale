@@ -17,7 +17,7 @@ public final class FleetFactory {
 	// ===========================================================
 	private final int gridSize;
 
-	private List<Integer> boatToMakeList = new ArrayList<>();
+	private List<Integer> fleetBlueprint = new ArrayList<>();
 
 	private FleetBean fleet; // Use as reference in all instance
 
@@ -26,10 +26,10 @@ public final class FleetFactory {
 	// ===========================================================
 	public FleetFactory(int gridSize) {
 		this.gridSize = gridSize;
-		boatToMakeList.add(4);
-		boatToMakeList.add(3);
-		boatToMakeList.add(2);
-		boatToMakeList.add(2);
+		fleetBlueprint.add(4);
+		fleetBlueprint.add(3);
+		fleetBlueprint.add(2);
+		fleetBlueprint.add(2);
 	}
 
 	// ===========================================================
@@ -45,7 +45,7 @@ public final class FleetFactory {
 	// ===========================================================
 	public FleetBean generateFleet() {
 		fleet = new FleetBean(new ArrayList<>());
-		for (int boatSize : boatToMakeList) {
+		for (int boatSize : fleetBlueprint) {
 			fleet.addBoat(generateBoat(boatSize));
 		}
 		return fleet;
@@ -62,30 +62,74 @@ public final class FleetFactory {
 		// return new BoatBean(new HashMap<PointBean, Boolean>());
 	}
 
+	/**
+	 * Create a boat with a point and a size.
+	 *
+	 * @param point
+	 * @param newBoatSize
+	 * @return A boat instance, or null if the boat cannot be create at this point
+	 */
 	private BoatBean createBoatAtThisPointWithThisSize(PointBean point, int newBoatSize) {
 		// Trouver une direction random et tester dans cette direction
 		Direction direction = Direction.values()[getRandomInt(0, 3)];
+		BoatBean newBoat = null;
 		int howMuchDirectionsTried = 0;
-		while (howMuchDirectionsTried < 4) {
-			if (isThisDirectionIsOK()) {
-				// Instantiate boat
+		while (howMuchDirectionsTried < 4 && newBoat == null) {
+			BoatFactory boatFactory = new BoatFactory(newBoatSize, point, direction);
+			newBoat = boatFactory.CreateBoat();
+			if (!(checkIfBoatGetValidPosition(newBoat))) {
+				newBoat = null;
+				direction.nexDirection();
+				howMuchDirectionsTried++;
 			}
-			direction.nexDirection();
-			howMuchDirectionsTried++;
+
 		}
-		return null;
+		return newBoat;
 	}
 
-	private boolean isThisDirectionIsOK() {
-		// Regarder si hors grille
-		if (!(pointIsOutOfGridBounds(point))) {
-			// Regarder si bateau déjà présent
-			// Créer le bateau
-		}
+	private boolean checkIfBoatGetValidPosition(BoatBean newBoat) {
+		boolean check = (boatIsNotOutOfGridBoud(newBoat) && boatIsNotCrossingOrCloseToAnotherBoat(newBoat));
+		return check;
 	}
 
-	private boolean pointIsOutOfGridBounds(PointBean point) {
+	private boolean boatIsNotCrossingOrCloseToAnotherBoat(BoatBean newBoat) {
+		if (fleet.getBoatList().size() > 0) {
+			for (BoatBean boatToCompare : fleet.getBoatList()) {
+				if (isThoseBoatsCrossingEachOther(newBoat, boatToCompare) && isThisBoatTooCloseAnotherBoat(newBoat)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
+	private boolean isThisBoatTooCloseAnotherBoat(BoatBean newBoat) {
+
+		return;
+	}
+
+	private boolean isThoseBoatsCrossingEachOther(BoatBean firstBoat, BoatBean secondBoat) {
+		for (PointBean point : firstBoat.getPointMap().keySet()) {
+			if (secondBoat.isAPointOfBoat(point)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean pointIsOutOfBoundGrid(PointBean point) {
+		boolean check = (point.getAxeX() < 1 && point.getAxeX() > gridSize && point.getAxeY() < 1
+				&& point.getAxeY() > gridSize);
+		return check;
+	}
+
+	private boolean boatIsNotOutOfGridBoud(BoatBean newBoat) {
+		for (PointBean point : newBoat.getPointMap().keySet()) {
+			if (pointIsOutOfBoundGrid(point)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private PointBean getRandomPoint() {

@@ -5,7 +5,7 @@ import java.util.Map;
 import adrar.barbeverte.exceptions.AlreadyTouchedPointOnThisBoatException;
 import adrar.barbeverte.exceptions.WrongPointOnBoatTouchedException;
 
-public class BoatBean implements Cloneable {
+public class BoatBean {
 
 	// ===========================================================
 	// Fields
@@ -15,7 +15,6 @@ public class BoatBean implements Cloneable {
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-
 	public BoatBean(Map<PointBean, Boolean> pointMap) {
 		this.pointMap = pointMap;
 	}
