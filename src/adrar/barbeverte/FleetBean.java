@@ -3,9 +3,7 @@ package adrar.barbeverte;
 import java.util.ArrayList;
 import java.util.List;
 
-import interfaces.FleetInterface;
-
-public final class FleetBean implements FleetInterface {
+public final class FleetBean {
 
 	// ===========================================================
 	// Fields
@@ -30,7 +28,6 @@ public final class FleetBean implements FleetInterface {
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
-	@Override
 	public boolean isThereABoatAtThisPoint(PointBean point) {
 		for (BoatBean boat : boatList) {
 			if (boat.isAPointOfBoat(point)) {
@@ -40,7 +37,19 @@ public final class FleetBean implements FleetInterface {
 		return false;
 	}
 
-	@Override
+	public void strikeAtThisPoint(PointBean point) {
+		for (BoatBean boat : boatList) {
+			if (boat.isAPointOfBoat(point) && !boat.isThisPointAlreadyTouched(point)) {
+				try {
+					boat.takeDamageAtThisPoint(point);
+					System.out.println("Boat Touched");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	public void addBoat(BoatBean boat) {
 		boatList.add(boat);
 	}

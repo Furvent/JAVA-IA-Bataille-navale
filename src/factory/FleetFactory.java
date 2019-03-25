@@ -154,10 +154,10 @@ public final class FleetFactory {
 	}
 
 	private boolean isPointInGrid(PointBean point) {
-		System.out.println("In isPointInGrid, point :" + point.getPosDescription());
+//		System.out.println("In isPointInGrid, point :" + point.getPosDescription());
 		boolean check = (point.getAxeX() >= 1 && point.getAxeX() <= gridSize && point.getAxeY() >= 1
 				&& point.getAxeY() <= gridSize);
-		System.out.println("Check is : " + check);
+//		System.out.println("Check is : " + check);
 		return check;
 	}
 

@@ -30,6 +30,15 @@ public class BoatBean {
 		return pointMap;
 	}
 
+	public boolean isSunk() {
+		for (boolean sunked : pointMap.values()) {
+			if (!sunked) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	// ===========================================================
 	// Methods
 	// ===========================================================
@@ -49,7 +58,7 @@ public class BoatBean {
 			throws WrongPointOnBoatTouchedException, AlreadyTouchedPointOnThisBoatException {
 		if (!(isThisPointExistInPointMap(point))) {
 			throw new WrongPointOnBoatTouchedException(this);
-		} else if (isThisPointExistInPointMap(point)) {
+		} else if (isThisPointAlreadyTouched(point)) {
 			throw new AlreadyTouchedPointOnThisBoatException(this);
 		} else {
 			makeBoatPointTouched(point);
@@ -66,6 +75,17 @@ public class BoatBean {
 		return description;
 	}
 
+	public boolean isThisPointAlreadyTouched(PointBean point) {
+		for (PointBean boatPoint : pointMap.keySet()) {
+			if (boatPoint.haveSamePosition(point)) {
+				if (pointMap.get(boatPoint)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private boolean isThisPointExistInPointMap(PointBean point) {
 		for (PointBean boatPoint : pointMap.keySet()) {
 			if (boatPoint.haveSamePosition(point)) {
@@ -76,9 +96,12 @@ public class BoatBean {
 	}
 
 	private void makeBoatPointTouched(PointBean point) {
+		System.out.println("Boat : " + getListOfPointsDescription() + " attacked");
 		for (Map.Entry<PointBean, Boolean> entry : pointMap.entrySet()) {
 			if (entry.getKey().haveSamePosition(point)) {
 				entry.setValue(true);
+				System.out
+						.println("Boat" + getListOfPointsDescription() + "touched, is this boat is sunk : " + isSunk());
 				return; // Bonne ou mauvaise idée ?
 			}
 		}
