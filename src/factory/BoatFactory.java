@@ -62,25 +62,25 @@ public final class BoatFactory {
 	}
 
 	private void populateInUpDirection() {
-		for (int i = 1; i <= SIZE; i++) {
+		for (int i = 0; i < SIZE; i++) {
 			pointMap.put(new PointBean(ORIGIN_POINT.getAxeX(), ORIGIN_POINT.getAxeY() - i), false);
 		}
 	}
 
 	private void populateInRightDirection() {
-		for (int i = 1; i <= SIZE; i++) {
+		for (int i = 0; i < SIZE; i++) {
 			pointMap.put(new PointBean(ORIGIN_POINT.getAxeX() + i, ORIGIN_POINT.getAxeY()), false);
 		}
 	}
 
 	private void populateInDownDirection() {
-		for (int i = 1; i <= SIZE; i++) {
+		for (int i = 0; i < SIZE; i++) {
 			pointMap.put(new PointBean(ORIGIN_POINT.getAxeX(), ORIGIN_POINT.getAxeY() + i), false);
 		}
 	}
 
 	private void populateInLeftDirection() {
-		for (int i = 1; i <= SIZE; i++) {
+		for (int i = 0; i < SIZE; i++) {
 			pointMap.put(new PointBean(ORIGIN_POINT.getAxeX() - i, ORIGIN_POINT.getAxeY()), false);
 		}
 	}

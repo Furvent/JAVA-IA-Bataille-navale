@@ -36,7 +36,7 @@ public final class PointBean {
 	}
 
 	public String getPosDescription() {
-		return "x:" + axeX + "-y:" + axeY;
+		return "x:" + axeX + "/y:" + axeY;
 	}
 
 }

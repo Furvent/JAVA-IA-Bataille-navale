@@ -21,11 +21,14 @@ public final class FleetFactory {
 
 	private FleetBean fleet; // Use as reference in all instance
 
+	private List<PointBean> pointsOccupiedList;
+
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 	public FleetFactory(int gridSize) {
 		this.gridSize = gridSize;
+		pointsOccupiedList = new ArrayList<>();
 		fleetBlueprint.add(4);
 		fleetBlueprint.add(3);
 		fleetBlueprint.add(2);
@@ -45,7 +48,9 @@ public final class FleetFactory {
 	// ===========================================================
 	public FleetBean generateFleet() {
 		fleet = new FleetBean(new ArrayList<>());
+		pointsOccupiedList.clear(); // Remise à zéro de la liste de points déjà occupés
 		for (int boatSize : fleetBlueprint) {
+			System.out.println("Debug : Generate a boat in function generateFleet");
 			fleet.addBoat(generateBoat(boatSize));
 		}
 		return fleet;
@@ -59,7 +64,8 @@ public final class FleetFactory {
 			// Trouver une Position random et tester à cette position
 			newBoat = createBoatAtThisPointWithThisSize(getRandomPoint(), newBoatSize);
 		}
-		// return new BoatBean(new HashMap<PointBean, Boolean>());
+		addPointsOccupied(newBoat);
+		return newBoat;
 	}
 
 	/**
@@ -73,39 +79,69 @@ public final class FleetFactory {
 		// Trouver une direction random et tester dans cette direction
 		Direction direction = Direction.values()[getRandomInt(0, 3)];
 		BoatBean newBoat = null;
-		int howMuchDirectionsTried = 0;
-		while (howMuchDirectionsTried < 4 && newBoat == null) {
+		int durectionTriedNumber = 0;
+		while (durectionTriedNumber < 4 && newBoat == null) {
 			BoatFactory boatFactory = new BoatFactory(newBoatSize, point, direction);
 			newBoat = boatFactory.CreateBoat();
-			if (!(checkIfBoatGetValidPosition(newBoat))) {
+			if (!(isBoatGetValidPosition(newBoat))) {
 				newBoat = null;
 				direction.nexDirection();
-				howMuchDirectionsTried++;
+				durectionTriedNumber++;
 			}
 
 		}
 		return newBoat;
 	}
 
-	private boolean checkIfBoatGetValidPosition(BoatBean newBoat) {
-		boolean check = (boatIsNotOutOfGridBoud(newBoat) && boatIsNotCrossingOrCloseToAnotherBoat(newBoat));
+	private boolean isBoatGetValidPosition(BoatBean newBoat) {
+		boolean check = isBoatInGrid(newBoat) && !isBoatCrossingOthersBoats(newBoat)
+				&& !isBoatTooCloseOthersBoats(newBoat);
 		return check;
 	}
 
-	private boolean boatIsNotCrossingOrCloseToAnotherBoat(BoatBean newBoat) {
+	private boolean isBoatCrossingOthersBoats(BoatBean newBoat) {
 		if (fleet.getBoatList().size() > 0) {
 			for (BoatBean boatToCompare : fleet.getBoatList()) {
-				if (isThoseBoatsCrossingEachOther(newBoat, boatToCompare) && isThisBoatTooCloseAnotherBoat(newBoat)) {
-					return false;
+				if (isThoseBoatsCrossingEachOther(newBoat, boatToCompare)) {
+					return true;
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 
-	private boolean isThisBoatTooCloseAnotherBoat(BoatBean newBoat) {
+	private boolean isBoatTooCloseOthersBoats(BoatBean newBoat) {
+		for (PointBean point : newBoat.getPointMap().keySet()) {
+			if (isPointTooCloseOtherBoats(point)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-		return;
+	private boolean isPointTooCloseOtherBoats(PointBean point) {
+		// Double boucle pour regarder toutes les cases autour du point, donc de -1 à 1
+		// pour les x et les y.
+		for (int x = -1; x < 2; x++) {
+
+			for (int y = -1; y < 2; y++) {
+				if (x != 0 || y != 0) { // Si pas le point actuel
+					if (isPointInPointOccupiedList(new PointBean(point.getAxeX() + x, point.getAxeY() + y))) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isPointInPointOccupiedList(PointBean point) {
+		for (PointBean pointOccupied : pointsOccupiedList) {
+			if (point.haveSamePosition(pointOccupied)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean isThoseBoatsCrossingEachOther(BoatBean firstBoat, BoatBean secondBoat) {
@@ -117,15 +153,17 @@ public final class FleetFactory {
 		return false;
 	}
 
-	private boolean pointIsOutOfBoundGrid(PointBean point) {
-		boolean check = (point.getAxeX() < 1 && point.getAxeX() > gridSize && point.getAxeY() < 1
-				&& point.getAxeY() > gridSize);
+	private boolean isPointInGrid(PointBean point) {
+		System.out.println("In isPointInGrid, point :" + point.getPosDescription());
+		boolean check = (point.getAxeX() >= 1 && point.getAxeX() <= gridSize && point.getAxeY() >= 1
+				&& point.getAxeY() <= gridSize);
+		System.out.println("Check is : " + check);
 		return check;
 	}
 
-	private boolean boatIsNotOutOfGridBoud(BoatBean newBoat) {
+	private boolean isBoatInGrid(BoatBean newBoat) {
 		for (PointBean point : newBoat.getPointMap().keySet()) {
-			if (pointIsOutOfBoundGrid(point)) {
+			if (!(isPointInGrid(point))) {
 				return false;
 			}
 		}
@@ -138,5 +176,11 @@ public final class FleetFactory {
 
 	private int getRandomInt(int min, int max) {
 		return (int) (Math.random() * max + min);
+	}
+
+	private void addPointsOccupied(BoatBean boat) {
+		for (PointBean point : boat.getPointMap().keySet()) {
+			pointsOccupiedList.add(point);
+		}
 	}
 }

@@ -61,6 +61,7 @@ public class BoatBean {
 
 		for (PointBean boatPoint : pointMap.keySet()) {
 			description += boatPoint.getPosDescription();
+			description += " --- ";
 		}
 		return description;
 	}
