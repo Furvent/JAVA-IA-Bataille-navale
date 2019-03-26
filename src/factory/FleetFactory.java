@@ -80,7 +80,7 @@ public final class FleetFactory {
 		Direction direction = Direction.values()[getRandomInt(0, 3)];
 		BoatBean newBoat = null;
 		int durectionTriedNumber = 0;
-		while (durectionTriedNumber < 4 && newBoat == null) {
+		while ((durectionTriedNumber < 4) && (newBoat == null)) {
 			BoatFactory boatFactory = new BoatFactory(newBoatSize, point, direction);
 			newBoat = boatFactory.CreateBoat();
 			if (!(isBoatGetValidPosition(newBoat))) {
@@ -125,7 +125,7 @@ public final class FleetFactory {
 		for (int x = -1; x < 2; x++) {
 
 			for (int y = -1; y < 2; y++) {
-				if (x != 0 || y != 0) { // Si pas le point actuel
+				if ((x != 0) || (y != 0)) { // Si pas le point actuel
 					if (isPointInPointOccupiedList(new PointBean(point.getAxeX() + x, point.getAxeY() + y))) {
 						return true;
 					}
@@ -153,17 +153,9 @@ public final class FleetFactory {
 		return false;
 	}
 
-	private boolean isPointInGrid(PointBean point) {
-//		System.out.println("In isPointInGrid, point :" + point.getPosDescription());
-		boolean check = (point.getAxeX() >= 1 && point.getAxeX() <= gridSize && point.getAxeY() >= 1
-				&& point.getAxeY() <= gridSize);
-//		System.out.println("Check is : " + check);
-		return check;
-	}
-
 	private boolean isBoatInGrid(BoatBean newBoat) {
 		for (PointBean point : newBoat.getPointMap().keySet()) {
-			if (!(isPointInGrid(point))) {
+			if (!(point.isInThisGrid(gridSize))) {
 				return false;
 			}
 		}
@@ -175,7 +167,7 @@ public final class FleetFactory {
 	}
 
 	private int getRandomInt(int min, int max) {
-		return (int) (Math.random() * max + min);
+		return (int) ((Math.random() * max) + min);
 	}
 
 	private void addPointsOccupied(BoatBean boat) {

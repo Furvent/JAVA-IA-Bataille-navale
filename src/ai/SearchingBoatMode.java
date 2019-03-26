@@ -1,23 +1,23 @@
-package ia;
-
-import java.util.List;
+package ai;
 
 import adrar.barbeverte.PointBean;
 
-public class Core {
+public class SearchingBoatMode {
 	// ===========================================================
 	// Constants
 	// ===========================================================
+	private final int GRID_SIZE;
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
-	List<PointBean> alreadyTouchedPointList;
-	HuntingBoat hunt;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
+	public SearchingBoatMode(int gridSize) {
+		GRID_SIZE = gridSize;
+	}
 
 	// ===========================================================
 	// Getter & Setter
@@ -30,4 +30,11 @@ public class Core {
 	// ===========================================================
 	// Methods
 	// ===========================================================
+	public PointBean debugGiveRandomePoint() {
+		return new PointBean(getRandomInt(1, GRID_SIZE), getRandomInt(1, GRID_SIZE));
+	}
+
+	private int getRandomInt(int min, int max) {
+		return (int) ((Math.random() * max) + min);
+	}
 }

@@ -47,22 +47,7 @@ public class PlayerBean {
 		fleet.getDescription();
 	}
 
-	/*
-	 * Juste un bouchon pour l'instant
-	 */
-	public PointBean choosePoint() {
-		return getRandomPoint(10);
-	}
-
 	public void incrementeScore() {
 		score++;
-	}
-
-	private PointBean getRandomPoint(int gridSize) {
-		return new PointBean(getRandomInt(1, gridSize), getRandomInt(1, gridSize));
-	}
-
-	private int getRandomInt(int min, int max) {
-		return (int) (Math.random() * max + min);
 	}
 }

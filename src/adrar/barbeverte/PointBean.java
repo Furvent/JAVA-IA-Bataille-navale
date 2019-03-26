@@ -32,11 +32,15 @@ public final class PointBean {
 	}
 
 	public boolean haveSamePosition(PointBean point) {
-		return point.getAxeX() == axeX && point.getAxeY() == axeY;
+		return (point.getAxeX() == axeX) && (point.getAxeY() == axeY);
 	}
 
 	public String getPosDescription() {
 		return "x:" + axeX + "/y:" + axeY;
+	}
+
+	public boolean isInThisGrid(int gridSize) {
+		return ((axeX >= 1) && (axeX <= gridSize) && (axeY >= 1) && (axeY <= gridSize));
 	}
 
 }
