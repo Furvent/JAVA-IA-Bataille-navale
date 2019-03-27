@@ -21,7 +21,7 @@ import adrar.barbeverte.exceptions.NoPointDeterminateToGiveItBackToPlayer;
  *
  */
 
-public class Core {
+public final class Core {
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -45,6 +45,10 @@ public class Core {
 	}
 
 	private Map<PointBean, Boolean> triedPointAndIsPointTouchedMap;
+
+	/**
+	 * Classe pour l'instant, pas encore incorporé dans Core
+	 */
 	private SearchingBoatMode searchMode;
 	private PointBean lastPointSentToPlayer;
 	private ModeAI mode;
@@ -61,10 +65,6 @@ public class Core {
 
 	// ===========================================================
 	// Getter & Setter
-	// ===========================================================
-
-	// ===========================================================
-	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
 
 	// ===========================================================
@@ -108,10 +108,13 @@ public class Core {
 			}
 		} else {
 			System.out.println("And i know the axe of the boat");
-			pointToStrike = continueToShootInTheAxeFound();
+			try {
+				pointToStrike = continueToShootInTheAxeFound();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		// TODO : REMOVE return
-		return null;
+		return pointToStrike;
 	}
 
 	private void pointSentToPlayerTouchedABoat() {
@@ -151,10 +154,10 @@ public class Core {
 	}
 
 	/**
-	 * Appel deux méthodes différentes selon l'axe mais qui ont le même
-	 * fonctionnement. Une extrémité est choisie aléatoirement, et si un point déjà
-	 * touché ou si les limites de la grille sont atteintes, l'autre côté est
-	 * exploré jusqu'à renvoyer un point non essayé
+	 * Appel une méthode qui où diffère seulement l'axe (horizontal ou vertical).
+	 * Une extrémité est choisie aléatoirement, et si un point déjà touché ou si les
+	 * limites de la grille sont atteintes, l'autre côté est exploré jusqu'à
+	 * renvoyer un point non essayé
 	 *
 	 * @return
 	 * @throws NoAxeException
@@ -163,28 +166,59 @@ public class Core {
 		if (axeOfBoatHunted == AxeBoat.HORIZONTAL) {
 			System.out.println("Continue to shoot in horizontal axe");
 			Direction direction = (getRandomInt(1, 2) == 1) ? Direction.LEFT : Direction.RIGHT;
-			return choosePointInHorizontalAxe(lastPointSentToPlayer, direction);
+			return choosePointInAxe(lastPointSentToPlayer, direction);
+
 		} else if (axeOfBoatHunted == AxeBoat.VERTICAL) {
 			System.out.println("Continue to shoot in vertical axe");
 			Direction direction = (getRandomInt(1, 2) == 1) ? Direction.UP : Direction.DOWN;
-			return choosePointInVerticalAxe();
+			return choosePointInAxe(lastPointSentToPlayer, direction);
 		} else {
 			throw new NoAxeException();
 		}
-		// TODO remove return null
-		return null;
 	}
 
-	private PointBean choosePointInHorizontalAxe(PointBean basePoint, Direction direction) {
+	/**
+	 * Recursive. Gros risque d'appel infini, à absolument contrôler.
+	 *
+	 * @param basePoint
+	 * @param direction
+	 * @return
+	 */
+	private PointBean choosePointInAxe(PointBean basePoint, Direction direction) {
 		PointBean pointToStrike = getPointFromThisPointAndDirection(basePoint, direction);
-		if (pointToStrike.isInThisGrid(GRID_SIZE) && isPointInMapTriedPointAndIsPointTouched(pointToStrike)) {
-			System.out.println("Point is in grid and not shoot yet");
-			 if (pointToStrike)
 
-		} else {
-			System.out.println("Point searched was out of grid or already tried, look into opposite direction");
+		// Si le point choisi a déjà été touché et qu'une partie du bateau avait été
+		// révélé
+		if (isPointInMapAndWasABoat(pointToStrike)) {
+			System.out.println(
+					"Point found is another point already touched of the boat. Trying another point in the same axe and the same direction");
+			System.out.println("Point is: ");
+			System.out.println(pointToStrike.getPosDescription());
+			return choosePointInAxe(pointToStrike, direction);
+
+			// Si le point choisi a déjà été touché mais qu'aucune partie du bateau ne s'y
+			// trouvait
+		} else if (isPointInMapTriedPointAndIsPointTouched(pointToStrike)) {
+			System.out.println("Point found was already shoot and no boat was here. Look into opposite direction");
+			System.out.println("Point is: ");
+			System.out.println(pointToStrike.getPosDescription());
 			direction.getOppositeDirection();
-			choosePointInHorizontalAxe(pointToStrike, direction);
+			return choosePointInAxe(pointToStrike, direction);
+
+			// Si le point choisi est en dehors de la grille
+		} else if (!pointToStrike.isInThisGrid(GRID_SIZE)) {
+			System.out.println("Point found is out of grid. Look into opposite direction");
+			System.out.println("Point is: ");
+			System.out.println(pointToStrike.getPosDescription());
+			direction.getOppositeDirection();
+			return choosePointInAxe(pointToStrike, direction);
+
+			// Et enfin, si le point choisi est encore complétement inconnu
+		} else {
+			System.out.println("Point found was never shoot, so we can try it.");
+			System.out.println("Point is: ");
+			System.out.println(pointToStrike.getPosDescription());
+			return pointToStrike;
 		}
 	}
 
@@ -197,14 +231,17 @@ public class Core {
 			throws AllDirectionsTestedException {
 		System.out.println("Try to determinate the axe of boat with DirectionTriedList");
 		PointBean pointToStrike = null;
+
 		if (notTriedDirectionInSinkModeList.size() <= 0) {
 			throw new AllDirectionsTestedException();
 		}
+
 		int indexRandom = getRandomInt(0, notTriedDirectionInSinkModeList.size() - 1);
 		Direction direction = notTriedDirectionInSinkModeList.get(indexRandom);
 		pointToStrike = getPointFromThisPointAndDirection(firstPointTouchedWhenInSinkMode, direction);
-		notTriedDirectionInSinkModeList.remove(indexRandom);// Au fur et à mesure de l'appel de cette fonction la List
-															// diminue.
+		// Au fur et à mesure de l'appel de cette fonction la Liste diminue.
+		notTriedDirectionInSinkModeList.remove(indexRandom);
+
 		if (!isPointInMapTriedPointAndIsPointTouched(pointToStrike) && pointToStrike.isInThisGrid(GRID_SIZE)) {
 			System.out.println("Valid point found !");
 			return pointToStrike;
@@ -223,9 +260,11 @@ public class Core {
 		return false;
 	}
 
-	private boolean isPointInMapWasABoat(PointBean pointToSearch) {
-		for (PointBean point : triedPointAndIsPointTouchedMap.keySet()) {
-			if (point.haveSamePosition(pointToSearch) && ) {
+	private boolean isPointInMapAndWasABoat(PointBean pointToSearch) {
+		for (Map.Entry<PointBean, Boolean> entry : triedPointAndIsPointTouchedMap.entrySet()) {
+			if (entry.getKey().haveSamePosition(pointToSearch) && entry.getValue()) {
+				System.out.println("Find value point with true in map. Point is :");
+				System.out.println(entry.getKey().getPosDescription());
 				return true;
 			}
 		}
@@ -274,7 +313,7 @@ public class Core {
 	}
 
 	private int getRandomInt(int min, int max) {
-		return (int) ((Math.random() * max - min) + min);
+		return (int) (((Math.random() * max) - min) + min);
 	}
 
 	@Deprecated

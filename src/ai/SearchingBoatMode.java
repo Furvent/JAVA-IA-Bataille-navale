@@ -2,7 +2,7 @@ package ai;
 
 import adrar.barbeverte.PointBean;
 
-public class SearchingBoatMode {
+public final class SearchingBoatMode {
 	// ===========================================================
 	// Constants
 	// ===========================================================

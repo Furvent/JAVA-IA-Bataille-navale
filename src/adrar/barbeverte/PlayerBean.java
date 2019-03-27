@@ -1,6 +1,6 @@
 package adrar.barbeverte;
 
-public class PlayerBean {
+public final class PlayerBean {
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -36,9 +36,6 @@ public class PlayerBean {
 	public void setFleet(FleetBean fleet) {
 		this.fleet = fleet;
 	}
-	// ===========================================================
-	// Methods for/from SuperClass/Interfaces
-	// ===========================================================
 
 	// ===========================================================
 	// Methods
