@@ -21,7 +21,7 @@ public class SinkingBoatMode {
 	private PointBean firstPointTouched;
 	private List<PointBean> alreadyTouchedPointList;
 	private List<Direction> directionTriedList;
-	private AxeBoat axeOfBoatHunted;
+	private AxeBoatHunted axeOfBoatHunted;
 
 	// ===========================================================
 	// Constructors
@@ -30,9 +30,10 @@ public class SinkingBoatMode {
 		this.firstPointTouched = firstPointTouched;
 		alreadyTouchedPointList = new ArrayList<>();
 		directionTriedList = new ArrayList<>();
-		alreadyTouchedPointList.add(firstPointTouched);
 		axeOfBoatHunted = null;
 		GRID_SIZE = gridSize;
+
+		alreadyTouchedPointList.add(firstPointTouched);
 	}
 
 	// ===========================================================
@@ -40,24 +41,38 @@ public class SinkingBoatMode {
 	// ===========================================================
 
 	// ===========================================================
-	// Methods for/from SuperClass/Interfaces
-	// ===========================================================
-
-	// ===========================================================
 	// Methods
 	// ===========================================================
 
-	public void successfullyTouchedAnotherPoint() { // WIP
+	public void successfullyTouchedAnotherPoint(PointBean pointSuccessful) {
+		System.out.println("In sinking mode, I get info from core ai that the last point sended touch successfully");
+		alreadyTouchedPointList.add(pointSuccessful);
 		if (axeOfBoatHunted == null) {
-			System.out.println("In sinking mode, ai will try to determinate the axe of the boat");
-			axeOfBoatHunted = determinateAxeWithTwoPoints();
+			System.out.println("Now i will try to determinate the axe of the boat");
+			try {
+				determinateAxeWithTwoPoints(firstPointTouched, pointSuccessful);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+
 		}
 	}
 
 	public PointBean determinateAPointToStrike() {
+		System.out.println("In sinking mode, core ai asked me to determinate a point.");
+		PointBean pointToStrike = null;
 		if (axeOfBoatHunted == null) {
-			PointBean pointToStrike = tryToDeterminateAxeOfBoatWithDirectionTriedList();
+			System.out.println("But i don't know yet the axe of the boat");
+			pointToStrike = tryToDeterminateAxeOfBoatWithDirectionTriedList();
+		} else {
+			System.out.println("And i know the axe of the boat");
+			pointToStrike = continueToShootInTheAxeFound();
 		}
+	}
+
+	private PointBean continueToShootInTheAxeFound() {
+		// axeOfBoatHunted.getPointToStrike()
 	}
 
 	private PointBean tryToDeterminateAxeOfBoatWithDirectionTriedList() {
@@ -113,7 +128,7 @@ public class SinkingBoatMode {
 			if (isDirectionInDirectionTriedList(direction)) {
 				direction.nexDirection();
 				numberOfDirectionTried++;
-				if (numberOfDirectionTried > 4) {
+				if (numberOfDirectionTried > Direction.values().length) {
 					throw new AllDirectionsTestedException();
 				}
 			} else {
@@ -154,14 +169,23 @@ public class SinkingBoatMode {
 		}
 	}
 
-	private AxeBoat determinateAxeWithTwoPoints() throws CantDeterminateAxeWithThisTwoPointsException {
-		if (isAxeHorizontal()) {
-
-		} else if (isAxeVertical) {
-
+	private void determinateAxeWithTwoPoints(PointBean firstPoint, PointBean secondPoint)
+			throws CantDeterminateAxeWithThisTwoPointsException {
+		if (isAxeHorizontal(firstPoint, secondPoint)) {
+			axeOfBoatHunted = new AxeBoatHunted(AxeBoat.HORIZONTAL, firstPoint, secondPoint);
+		} else if (isAxeVertical(firstPoint, secondPoint)) {
+			axeOfBoatHunted = new AxeBoatHunted(AxeBoat.VERTICAL, firstPoint, secondPoint);
 		} else {
-			throw new CantDeterminateAxeWithThisTwoPointsException(firstPoint, secondPoint)
+			throw new CantDeterminateAxeWithThisTwoPointsException(firstPoint, secondPoint);
 		}
+	}
+
+	private boolean isAxeVertical(PointBean firstPoint, PointBean secondPoint) {
+		return (firstPoint.getAxeX() == secondPoint.getAxeX());
+	}
+
+	private boolean isAxeHorizontal(PointBean firstPoint, PointBean secondPoint) {
+		return (firstPoint.getAxeY() == secondPoint.getAxeY());
 	}
 
 	private int getRandomInt(int min, int max) {
