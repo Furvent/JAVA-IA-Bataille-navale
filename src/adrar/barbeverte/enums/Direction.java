@@ -33,4 +33,24 @@ public enum Direction {
 		}
 	}
 
+	public void getOppositeDirection() {
+		switch (value) {
+		case 0:
+			value = 2;
+			break;
+		case 1:
+			value = 3;
+			break;
+		case 2:
+			value = 0;
+			break;
+		case 3:
+			value = 1;
+			break;
+
+		default:
+			break;
+		}
+	}
+
 }

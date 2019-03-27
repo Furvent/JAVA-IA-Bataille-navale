@@ -186,12 +186,4 @@ public class SinkingBoatMode {
 		return (int) ((Math.random() * max) + min);
 	}
 
-	private boolean isDirectionInDirectionTriedList(Direction direction) {
-		for (Direction directionInList : directionTriedList) {
-			if (direction == directionInList) {
-				return true;
-			}
-		}
-		return false;
-	}
 }
