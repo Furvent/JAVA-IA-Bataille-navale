@@ -1,7 +1,7 @@
 package adrar.barbeverte.enums;
 
 public enum AxeBoat {
-	HORIZONTAL(0), VERTICAL(1);
+	HORIZONTAL(0), VERTICAL(1), UNDEFINED(2);
 
 	private int value;
 

@@ -1,7 +1,6 @@
 package ai;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import adrar.barbeverte.PointBean;
 import adrar.barbeverte.enums.AxeBoat;
@@ -13,15 +12,10 @@ public class SinkingBoatMode {
 	// ===========================================================
 	// Constants
 	// ===========================================================
-	private final int GRID_SIZE;
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
-	private PointBean firstPointTouched;
-	private List<PointBean> alreadyTouchedPointList;
-	private List<Direction> directionTriedList;
-	private AxeBoatHunted axeOfBoatHunted;
 
 	// ===========================================================
 	// Constructors
