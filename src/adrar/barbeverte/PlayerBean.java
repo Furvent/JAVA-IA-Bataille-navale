@@ -1,5 +1,8 @@
 package adrar.barbeverte;
 
+import adrar.barbeverte.enums.ShotFeedback;
+import ai.Core;
+
 public final class PlayerBean {
 	// ===========================================================
 	// Constants
@@ -9,12 +12,14 @@ public final class PlayerBean {
 	// Fields
 	// ===========================================================
 	private FleetBean fleet;
+	private Core ai;
 	private int score;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-	public PlayerBean() {
+	public PlayerBean(Core ai) {
+		this.ai = ai;
 		score = 0;
 	}
 
@@ -46,5 +51,19 @@ public final class PlayerBean {
 
 	public void incrementeScore() {
 		score++;
+	}
+
+	public PointBean chooseAPoint() {
+		PointBean pointBean = null;
+		try {
+			pointBean = ai.dearIAGiveMeAPoint();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return pointBean;
+	}
+
+	public void getFeedbackAboutLastShoot(ShotFeedback feedback) {
+
 	}
 }

@@ -1,5 +1,7 @@
 package adrar.barbeverte;
 
+import ai.Core;
+
 public class IArena {
 	// ===========================================================
 	// Constants
@@ -32,8 +34,10 @@ public class IArena {
 	// ===========================================================
 
 	public void launchTest() {
-		player1 = new PlayerBean();
-		player2 = new PlayerBean();
+		Core ai1 = new Core(GRID_SIZE);
+		Core ai2 = new Core(GRID_SIZE);
+		player1 = new PlayerBean(ai1);
+		player2 = new PlayerBean(ai2);
 		for (int i = 0; i < NUMBER_OF_TRY; i++) {
 			launchAParty();
 		}

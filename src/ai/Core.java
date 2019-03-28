@@ -8,6 +8,7 @@ import adrar.barbeverte.PointBean;
 import adrar.barbeverte.enums.AxeBoat;
 import adrar.barbeverte.enums.Direction;
 import adrar.barbeverte.enums.ModeAI;
+import adrar.barbeverte.enums.ShotFeedback;
 import adrar.barbeverte.exceptions.AllDirectionsTestedException;
 import adrar.barbeverte.exceptions.CantDeterminateAxeWithThisTwoPointsException;
 import adrar.barbeverte.exceptions.NoAxeException;
@@ -87,13 +88,34 @@ public final class Core {
 		}
 	}
 
-	public void getFeedBackAboutPointSentToPlayer(boolean pointWasTouched) {
-		triedPointAndIsPointTouchedMap.put(lastPointSentToPlayer, pointWasTouched);
-		if (pointWasTouched) {
-			pointSentToPlayerTouchedABoat();
-		} else {
+	/**
+	 * A diviser en deux fonctions
+	 *
+	 * @param feedback
+	 */
+	public void getFeedBackAboutPointSentToPlayer(ShotFeedback feedback) {
+		boolean isPointTouched = (feedback == ShotFeedback.MISSED) ? false : true;
+		triedPointAndIsPointTouchedMap.put(lastPointSentToPlayer, isPointTouched);
+
+		switch (feedback) {
+		case MISSED:
 			pointSentToPlayerDidntTouchABoat();
+			break;
+
+		case SUNK:
+			pointSentToPlayerSunkABoat();
+			break;
+		case TOUCHED:
+			pointSentToPlayerTouchedABoat();
+			break;
+		default:
+			break;
 		}
+	}
+
+	private void pointSentToPlayerSunkABoat() {
+		// TODO Auto-generated method stub
+
 	}
 
 	private PointBean determinateAPointToStrikeInSinkMode() {

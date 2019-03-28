@@ -15,6 +15,9 @@ public final class Party {
 	private PlayerBean winner;
 	private int turn;
 
+	// ===========================================================
+	// Constructors
+	// ===========================================================
 	public Party(PlayerBean player1, PlayerBean player2) {
 		this.player1 = player1;
 		this.player2 = player2;
@@ -23,15 +26,7 @@ public final class Party {
 	}
 
 	// ===========================================================
-	// Constructors
-	// ===========================================================
-
-	// ===========================================================
 	// Getter & Setter
-	// ===========================================================
-
-	// ===========================================================
-	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
 
 	// ===========================================================
@@ -66,14 +61,14 @@ public final class Party {
 			winner = player1;
 		}
 		if (!player1.getFleet().getBoatList().isEmpty()) {
-			playerIsAttackedAtThisPoint(player2, player1.choosePoint());
+			playerIsAttackedAtThisPoint(player2, player1.chooseAPoint());
 			System.out.println("Player 1 has played");
 		} else {
 			winner = player2;
 		}
 
 		if (!player2.getFleet().getBoatList().isEmpty()) {
-			playerIsAttackedAtThisPoint(player1, player2.choosePoint());
+			playerIsAttackedAtThisPoint(player1, player2.chooseAPoint());
 			System.out.println("Player 2 has played");
 		} else {
 			winner = player1;
