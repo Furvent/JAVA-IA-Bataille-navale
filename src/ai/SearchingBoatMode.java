@@ -31,6 +31,7 @@ public final class SearchingBoatMode {
 	// Methods
 	// ===========================================================
 	public PointBean debugGiveRandomePoint() {
+		System.out.println("I'm in searching mode, and core ai asked me to find a point");
 		return new PointBean(getRandomInt(1, GRID_SIZE), getRandomInt(1, GRID_SIZE));
 	}
 

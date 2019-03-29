@@ -3,6 +3,8 @@ package adrar.barbeverte;
 import java.util.ArrayList;
 import java.util.List;
 
+import adrar.barbeverte.enums.ShotFeedback;
+
 public final class FleetBean {
 
 	// ===========================================================
@@ -37,12 +39,16 @@ public final class FleetBean {
 		return false;
 	}
 
-	public void strikeAtThisPoint(PointBean point) {
+	public ShotFeedback strikeAtThisPoint(PointBean point) {
 		for (BoatBean boat : boatList) {
 			if (boat.isAPointOfBoat(point) && !boat.isThisPointAlreadyTouched(point)) {
 				try {
 					boat.takeDamageAtThisPoint(point);
-					System.out.println("Boat Touched");
+					if (boat.isSunk()) {
+						boatList.re
+						return ShotFeedback.SUNK;
+					}
+					System.out.println("In Fleet : Boat Touched");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

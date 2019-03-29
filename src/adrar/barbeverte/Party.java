@@ -1,5 +1,6 @@
 package adrar.barbeverte;
 
+import adrar.barbeverte.enums.ShotFeedback;
 import factory.FleetFactory;
 
 public final class Party {
@@ -36,7 +37,8 @@ public final class Party {
 		FleetFactory fleetFactory = new FleetFactory(gridSize);
 		player1.setFleet(fleetFactory.generateFleet());
 		player2.setFleet(fleetFactory.generateFleet());
-		// Réinitialiser les données stockées par l'ia
+		player1.initAIData();
+		player2.initAIData();
 	}
 
 	public void RunParty() {
@@ -49,9 +51,12 @@ public final class Party {
 		describeParty();
 	}
 
-	private void playerIsAttackedAtThisPoint(PlayerBean player, PointBean point) {
+	private ShotFeedback playerIsAttackedAtThisPoint(PlayerBean player, PointBean point) {
 		if (player.getFleet().isThereABoatAtThisPoint(point)) {
 			player.getFleet().strikeAtThisPoint(point);
+			return ShotFeedback.TOUCHED;
+		} else {
+			return ShotFeedback.MISSED;
 		}
 	}
 

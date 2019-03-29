@@ -1,6 +1,7 @@
 package ai;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,12 +46,21 @@ public final class Core {
 		axeOfBoatHunted = AxeBoat.UNDEFINED;
 	}
 
+	private void resetSinkModeDate() {
+		firstPointTouchedWhenInSinkMode = null;
+		if (notTriedDirectionInSinkModeList != null) {
+			notTriedDirectionInSinkModeList.clear();
+		}
+		axeOfBoatHunted = AxeBoat.UNDEFINED;
+	}
+
 	private Map<PointBean, Boolean> triedPointAndIsPointTouchedMap;
 
 	/**
 	 * Classe pour l'instant, pas encore incorporé dans Core
 	 */
 	private SearchingBoatMode searchMode;
+
 	private PointBean lastPointSentToPlayer;
 	private ModeAI mode;
 
@@ -58,6 +68,7 @@ public final class Core {
 	// Constructors
 	// ===========================================================
 	public Core(int gridSize) {
+		triedPointAndIsPointTouchedMap = new HashMap<>();
 		GRID_SIZE = gridSize;
 		searchMode = new SearchingBoatMode(GRID_SIZE);
 		mode = ModeAI.SEARCH;
@@ -76,9 +87,11 @@ public final class Core {
 		switch (mode) {
 		case SEARCH:
 			lastPointSentToPlayer = searchMode.debugGiveRandomePoint();
+			System.out.println("Point renvoyé au player : " + lastPointSentToPlayer.getPosDescription());
 			break;
 		case SINK:
 			lastPointSentToPlayer = determinateAPointToStrikeInSinkMode();
+			System.out.println("Point renvoyé au player : " + lastPointSentToPlayer.getPosDescription());
 			break;
 		}
 		if (lastPointSentToPlayer == null) {
@@ -86,6 +99,13 @@ public final class Core {
 		} else {
 			return lastPointSentToPlayer;
 		}
+	}
+
+	public void initAllData() {
+		resetSinkModeDate();
+		mode = ModeAI.SEARCH;
+		triedPointAndIsPointTouchedMap.clear();
+		lastPointSentToPlayer = null;
 	}
 
 	/**
@@ -101,7 +121,6 @@ public final class Core {
 		case MISSED:
 			pointSentToPlayerDidntTouchABoat();
 			break;
-
 		case SUNK:
 			pointSentToPlayerSunkABoat();
 			break;
@@ -114,8 +133,9 @@ public final class Core {
 	}
 
 	private void pointSentToPlayerSunkABoat() {
-		// TODO Auto-generated method stub
-
+		System.out.println("Boat was sink !");
+		mode = ModeAI.SEARCH;
+		resetSinkModeDate();
 	}
 
 	private PointBean determinateAPointToStrikeInSinkMode() {
@@ -154,13 +174,15 @@ public final class Core {
 	}
 
 	private void pointSentToPlayerDidntTouchABoat() {
+
 		System.out.println("The shoot didn't touch a boat");
-		switch (mode) {
-		case SEARCH:
-			break;
-		case SINK:
-			break;
-		}
+//		switch (mode) {
+//		case SEARCH:
+//			break;
+//		case SINK:
+//			break;
+//		}
+
 	}
 
 	private void getFeedbackSuccessfullyTouchedAnotherPointInSinkMode() {

@@ -66,4 +66,8 @@ public final class PlayerBean {
 	public void getFeedbackAboutLastShoot(ShotFeedback feedback) {
 
 	}
+
+	public void initAIData() {
+		ai.initAllData();
+	}
 }
