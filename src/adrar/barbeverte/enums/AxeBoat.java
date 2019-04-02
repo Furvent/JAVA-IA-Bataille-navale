@@ -12,4 +12,17 @@ public enum AxeBoat {
 	public int getValue() {
 		return value;
 	}
+
+	public String getAxeDescription() {
+		switch (value) {
+		case 0:
+			return "HORIZONTAL";
+		case 1:
+			return "VERTICAL";
+		case 2:
+			return "UNDEFINED";
+		default:
+			return "ERROR, NO AXE";
+		}
+	}
 }

@@ -10,6 +10,15 @@ public class App {
 //		fleet.getGraphicRepresentation();
 
 		IArena arena = new IArena();
-		arena.launchTest();
+		// arena.launchTest();
+		arena.debugLaunchTest();
+//		for (int i = 0; i < 100; i++) {
+//			System.out.println(Util.getRandomInt(0, 3));
+//		}
+
+//		PointBean pointBean = new PointBean(1, 1);
+//		PointBean secondPointBean = Core.getPointFromThisPointAndDirection(pointBean, Direction.DOWN);
+//		System.out.println("First point : " + pointBean.getPosDescription());
+//		System.out.println("First point : " + secondPointBean.getPosDescription());
 	}
 }

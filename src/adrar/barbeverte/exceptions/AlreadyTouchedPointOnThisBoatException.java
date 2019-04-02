@@ -2,7 +2,7 @@ package adrar.barbeverte.exceptions;
 
 import adrar.barbeverte.BoatBean;
 
-public final class AlreadyTouchedPointOnThisBoatException extends Exception {
+public final class AlreadyTouchedPointOnThisBoatException extends RuntimeException {
 	// ===========================================================
 	// Constants
 	// ===========================================================

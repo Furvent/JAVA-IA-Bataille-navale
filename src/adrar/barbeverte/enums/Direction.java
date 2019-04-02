@@ -1,7 +1,7 @@
 package adrar.barbeverte.enums;
 
 public enum Direction {
-	UP(0), RIGHT(1), DOWN(2), LEFT(3);
+	UP(0), RIGHT(1), DOWN(2), LEFT(3), UNDEFINED(4);
 
 	private int value;
 
@@ -27,29 +27,36 @@ public enum Direction {
 		case 3:
 			value = 0;
 			break;
-		default:
-			value = 0;
-			break;
 		}
 	}
 
-	public void getOppositeDirection() {
+	public static Direction getOppositeDirection(Direction direction) {
+		switch (direction) {
+		case UP:
+			return Direction.DOWN;
+		case RIGHT:
+			return Direction.LEFT;
+		case DOWN:
+			return Direction.UP;
+		case LEFT:
+			return Direction.RIGHT;
+		default:
+			return Direction.UNDEFINED;
+		}
+	}
+
+	public String getDirectionDescription() {
 		switch (value) {
 		case 0:
-			value = 2;
-			break;
+			return "UP";
 		case 1:
-			value = 3;
-			break;
+			return "RIGHT";
 		case 2:
-			value = 0;
-			break;
+			return "DOWN";
 		case 3:
-			value = 1;
-			break;
-
+			return "LEFT";
 		default:
-			break;
+			return "ERROR, NO DIRECTION";
 		}
 	}
 

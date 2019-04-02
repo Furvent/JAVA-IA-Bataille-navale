@@ -6,18 +6,20 @@ import java.util.List;
 import java.util.Map;
 
 import adrar.barbeverte.PointBean;
+import adrar.barbeverte.Util;
 import adrar.barbeverte.enums.AxeBoat;
 import adrar.barbeverte.enums.Direction;
 import adrar.barbeverte.enums.ModeAI;
 import adrar.barbeverte.enums.ShotFeedback;
 import adrar.barbeverte.exceptions.AllDirectionsTestedException;
+import adrar.barbeverte.exceptions.AlreadySendPointException;
 import adrar.barbeverte.exceptions.CantDeterminateAxeWithThisTwoPointsException;
 import adrar.barbeverte.exceptions.NoAxeException;
 import adrar.barbeverte.exceptions.NoPointDeterminateToGiveItBackToPlayer;
+import adrar.barbeverte.exceptions.bothPointAtExtrimityOfAxeHorizontalAreInvalidException;
+import adrar.barbeverte.exceptions.bothPointAtExtrimityOfAxeVerticalAreInvalidException;
 
 /**
- * TODO : Ne pas oublier de rajouter les points touchés dans la map
- * triedPointList
  *
  * @author matthieuKoskas
  *
@@ -34,32 +36,46 @@ public final class Core {
 	// ===========================================================
 	private PointBean firstPointTouchedWhenInSinkMode;
 	private List<Direction> notTriedDirectionInSinkModeList;
+	private List<PointBean> sinkModePointOfBoatHuntedList;
 	private AxeBoat axeOfBoatHunted;
 
+	/**
+	 * Créé la liste de direction pas encore essayée, et la liste de points où le
+	 * bateau chassé a été touché. Donc le premier point est rajouté.
+	 */
 	private void initSinkMode() {
+		mode = ModeAI.SINK;
 		firstPointTouchedWhenInSinkMode = lastPointSentToPlayer;
+
 		notTriedDirectionInSinkModeList = new ArrayList<>();
 		notTriedDirectionInSinkModeList.add(Direction.UP);
 		notTriedDirectionInSinkModeList.add(Direction.RIGHT);
 		notTriedDirectionInSinkModeList.add(Direction.DOWN);
 		notTriedDirectionInSinkModeList.add(Direction.LEFT);
+
+		sinkModePointOfBoatHuntedList = new ArrayList<>();
+		sinkModePointOfBoatHuntedList.add(lastPointSentToPlayer);
 		axeOfBoatHunted = AxeBoat.UNDEFINED;
 	}
 
 	private void resetSinkModeDate() {
 		firstPointTouchedWhenInSinkMode = null;
+
 		if (notTriedDirectionInSinkModeList != null) {
 			notTriedDirectionInSinkModeList.clear();
+		}
+
+		if (sinkModePointOfBoatHuntedList != null) {
+			sinkModePointOfBoatHuntedList.clear();
 		}
 		axeOfBoatHunted = AxeBoat.UNDEFINED;
 	}
 
-	private Map<PointBean, Boolean> triedPointAndIsPointTouchedMap;
+	private Map<PointBean, Boolean> triedPointAndPointWasBoatMap;
 
 	/**
 	 * Classe pour l'instant, pas encore incorporé dans Core
 	 */
-	private SearchingBoatMode searchMode;
 
 	private PointBean lastPointSentToPlayer;
 	private ModeAI mode;
@@ -68,9 +84,8 @@ public final class Core {
 	// Constructors
 	// ===========================================================
 	public Core(int gridSize) {
-		triedPointAndIsPointTouchedMap = new HashMap<>();
+		triedPointAndPointWasBoatMap = new HashMap<>();
 		GRID_SIZE = gridSize;
-		searchMode = new SearchingBoatMode(GRID_SIZE);
 		mode = ModeAI.SEARCH;
 		axeOfBoatHunted = AxeBoat.UNDEFINED;
 	}
@@ -82,11 +97,11 @@ public final class Core {
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	public PointBean dearIAGiveMeAPoint() throws NoPointDeterminateToGiveItBackToPlayer {
-		lastPointSentToPlayer = null;
+	public PointBean dearIAGiveMeAPoint() throws NoPointDeterminateToGiveItBackToPlayer, AlreadySendPointException {
+		System.out.println("In AI, Player asked me a point and i'm in " + mode.getModeDescription() + " MODE.");
 		switch (mode) {
 		case SEARCH:
-			lastPointSentToPlayer = searchMode.debugGiveRandomePoint();
+			lastPointSentToPlayer = debugGiveRandomePoint(0);
 			System.out.println("Point renvoyé au player : " + lastPointSentToPlayer.getPosDescription());
 			break;
 		case SINK:
@@ -96,15 +111,18 @@ public final class Core {
 		}
 		if (lastPointSentToPlayer == null) {
 			throw new NoPointDeterminateToGiveItBackToPlayer();
+		} else if (isPointInMapTriedPoint(lastPointSentToPlayer)) {
+			throw new AlreadySendPointException();
 		} else {
 			return lastPointSentToPlayer;
 		}
 	}
 
 	public void initAllData() {
+		System.out.println("Init all data in AI");
 		resetSinkModeDate();
 		mode = ModeAI.SEARCH;
-		triedPointAndIsPointTouchedMap.clear();
+		triedPointAndPointWasBoatMap.clear();
 		lastPointSentToPlayer = null;
 	}
 
@@ -115,7 +133,7 @@ public final class Core {
 	 */
 	public void getFeedBackAboutPointSentToPlayer(ShotFeedback feedback) {
 		boolean isPointTouched = (feedback == ShotFeedback.MISSED) ? false : true;
-		triedPointAndIsPointTouchedMap.put(lastPointSentToPlayer, isPointTouched);
+		triedPointAndPointWasBoatMap.put(lastPointSentToPlayer, isPointTouched);
 
 		switch (feedback) {
 		case MISSED:
@@ -132,6 +150,22 @@ public final class Core {
 		}
 	}
 
+	private PointBean debugGiveRandomePoint(int numberOfTry) {
+		if (numberOfTry > 50) {
+			System.exit(0);
+		}
+		numberOfTry++;
+		PointBean pointToSend = new PointBean(Util.getRandomInt(1, GRID_SIZE), Util.getRandomInt(1, GRID_SIZE));
+		if (isPointInMapTriedPoint(pointToSend)) {
+			// DEBUG
+			debugGetVisualGridOfPointTried();
+			return debugGiveRandomePoint(numberOfTry);
+
+		} else {
+			return pointToSend;
+		}
+	}
+
 	private void pointSentToPlayerSunkABoat() {
 		System.out.println("Boat was sink !");
 		mode = ModeAI.SEARCH;
@@ -141,7 +175,7 @@ public final class Core {
 	private PointBean determinateAPointToStrikeInSinkMode() {
 		System.out.println("In sinking mode, core ai asked me to determinate a point.");
 		PointBean pointToStrike = null;
-		if (axeOfBoatHunted == null) {
+		if (axeOfBoatHunted == AxeBoat.UNDEFINED) {
 			System.out.println("But i don't know yet the axe of the boat");
 			try {
 				pointToStrike = tryToDeterminateAxeOfBoatWithNotTriedDirectionInSinkModeList();
@@ -186,6 +220,8 @@ public final class Core {
 	}
 
 	private void getFeedbackSuccessfullyTouchedAnotherPointInSinkMode() {
+		// Instruction suivante très importante, permet de continuer à chasser le bateau
+		sinkModePointOfBoatHuntedList.add(lastPointSentToPlayer);
 		System.out.println("In sinking mode, I get info from core ai that the last point sended touch successfully");
 		if (axeOfBoatHunted == AxeBoat.UNDEFINED) {
 			System.out.println("Now i will try to determinate the axe of the boat");
@@ -198,8 +234,8 @@ public final class Core {
 	}
 
 	/**
-	 * Appel une méthode qui où diffère seulement l'axe (horizontal ou vertical).
-	 * Une extrémité est choisie aléatoirement, et si un point déjà touché ou si les
+	 * Appel une méthode où diffère seulement l'axe (horizontal ou vertical). Une
+	 * extrémité est choisie aléatoirement, et si un point déjà touché ou si les
 	 * limites de la grille sont atteintes, l'autre côté est exploré jusqu'à
 	 * renvoyer un point non essayé
 	 *
@@ -207,28 +243,120 @@ public final class Core {
 	 * @throws NoAxeException
 	 */
 	private PointBean continueToShootInTheAxeFound() throws NoAxeException {
+		PointBean pointToSend = null;
 		if (axeOfBoatHunted == AxeBoat.HORIZONTAL) {
 			System.out.println("Continue to shoot in horizontal axe");
-			Direction direction = (getRandomInt(1, 2) == 1) ? Direction.LEFT : Direction.RIGHT;
-			return choosePointInAxe(lastPointSentToPlayer, direction);
+//			Direction direction = (Util.getRandomInt(1, 2) == 1) ? Direction.LEFT : Direction.RIGHT;
+//			return choosePointInAxe(lastPointSentToPlayer, direction);
+			try {
+				pointToSend = shootInHorizontalAxe();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
 
 		} else if (axeOfBoatHunted == AxeBoat.VERTICAL) {
 			System.out.println("Continue to shoot in vertical axe");
-			Direction direction = (getRandomInt(1, 2) == 1) ? Direction.UP : Direction.DOWN;
-			return choosePointInAxe(lastPointSentToPlayer, direction);
+//			Direction direction = (Util.getRandomInt(1, 2) == 1) ? Direction.UP : Direction.DOWN;
+//			return choosePointInAxe(lastPointSentToPlayer, direction);
+			try {
+				pointToSend = shootInVerticalAxe();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
 		} else {
 			throw new NoAxeException();
 		}
+		return pointToSend;
+	}
+
+	private PointBean shootInVerticalAxe() throws bothPointAtExtrimityOfAxeVerticalAreInvalidException {
+		// On regarde à quelle position X sont situés les points déjà trouvés et on
+		// retourne le plus petit et le plus grand X.
+		int smallerOrdinate = getSmallerOrdinateFromTouchedPointofHuntingBoat();
+		int higherOrdinate = getHigherOrdinateFromTouchedPointOfHuntingBoat();
+
+		if (thisPointIsAvailable(new PointBean(lastPointSentToPlayer.getAxeX(), smallerOrdinate - 1))) {
+			return new PointBean(lastPointSentToPlayer.getAxeX(), smallerOrdinate - 1);
+		} else if (thisPointIsAvailable(new PointBean(lastPointSentToPlayer.getAxeX(), higherOrdinate + 1))) {
+			return new PointBean(lastPointSentToPlayer.getAxeX(), smallerOrdinate + 1);
+		} else {
+			throw new bothPointAtExtrimityOfAxeVerticalAreInvalidException(smallerOrdinate, higherOrdinate);
+		}
+	}
+
+	private int getHigherOrdinateFromTouchedPointOfHuntingBoat() {
+		int higherOrdinate = 0;
+		for (PointBean point : sinkModePointOfBoatHuntedList) {
+			if (point.getAxeY() > higherOrdinate) {
+				higherOrdinate = point.getAxeY();
+			}
+		}
+		return higherOrdinate;
+	}
+
+	private int getSmallerOrdinateFromTouchedPointofHuntingBoat() {
+		int smallerOrdinate = GRID_SIZE + 1;
+		for (PointBean point : sinkModePointOfBoatHuntedList) {
+			if (point.getAxeY() < smallerOrdinate) {
+				smallerOrdinate = point.getAxeY();
+			}
+		}
+		return smallerOrdinate;
+	}
+
+	private PointBean shootInHorizontalAxe() throws bothPointAtExtrimityOfAxeHorizontalAreInvalidException {
+		// On regarde à quelle position X sont situés les points déjà trouvés et on
+		// retourne le plus petit et le plus grand X.
+		int smallerAbscissa = getSmallerAbscissaFromTouchedPointofHuntingBoat();
+		int higherAbscissa = getHigherAbscissaFromTouchedPointOfHuntingBoat();
+
+		if (thisPointIsAvailable(new PointBean(smallerAbscissa - 1, lastPointSentToPlayer.getAxeY()))) {
+			return new PointBean(smallerAbscissa - 1, lastPointSentToPlayer.getAxeY());
+		} else if (thisPointIsAvailable(new PointBean(higherAbscissa + 1, lastPointSentToPlayer.getAxeY()))) {
+			return new PointBean(higherAbscissa + 1, lastPointSentToPlayer.getAxeY());
+		} else {
+			throw new bothPointAtExtrimityOfAxeHorizontalAreInvalidException(smallerAbscissa, higherAbscissa);
+		}
+	}
+
+	private boolean thisPointIsAvailable(PointBean point) {
+		return isPointInMapTriedPoint(point) || point.isInThisGrid(GRID_SIZE);
+	}
+
+	private int getHigherAbscissaFromTouchedPointOfHuntingBoat() {
+		int higherAbscissa = 0;
+		for (PointBean point : sinkModePointOfBoatHuntedList) {
+			if (point.getAxeX() > higherAbscissa) {
+				higherAbscissa = point.getAxeX();
+			}
+		}
+		return higherAbscissa;
+	}
+
+	private int getSmallerAbscissaFromTouchedPointofHuntingBoat() {
+		int smallerAbscissa = GRID_SIZE + 1;
+		for (PointBean point : sinkModePointOfBoatHuntedList) {
+			if (point.getAxeX() < smallerAbscissa) {
+				smallerAbscissa = point.getAxeX();
+			}
+		}
+		return smallerAbscissa;
 	}
 
 	/**
-	 * Recursive. Gros risque d'appel infini, à absolument contrôler.
+	 * Recursive. Gros risque d'appel infini, à absolument contrôler. Effectivement,
+	 * en plein debug, c'est le cas. Solutions possibles : changer la logique, peut
+	 * être créer une classe. Ou enlever la récursivité. Voir avec la fonction qui
+	 * appelle celle ci (continueToShootInAxeFound)
 	 *
 	 * @param basePoint
 	 * @param direction
 	 * @return
 	 */
 	private PointBean choosePointInAxe(PointBean basePoint, Direction direction) {
+		System.out.println("Je cherche un point dans cette direction : " + direction.getDirectionDescription());
 		PointBean pointToStrike = getPointFromThisPointAndDirection(basePoint, direction);
 
 		// Si le point choisi a déjà été touché et qu'une partie du bateau avait été
@@ -236,32 +364,28 @@ public final class Core {
 		if (isPointInMapAndWasABoat(pointToStrike)) {
 			System.out.println(
 					"Point found is another point already touched of the boat. Trying another point in the same axe and the same direction");
-			System.out.println("Point is: ");
-			System.out.println(pointToStrike.getPosDescription());
+			System.out.println("Point is: " + pointToStrike.getPosDescription());
 			return choosePointInAxe(pointToStrike, direction);
 
 			// Si le point choisi a déjà été touché mais qu'aucune partie du bateau ne s'y
 			// trouvait
-		} else if (isPointInMapTriedPointAndIsPointTouched(pointToStrike)) {
+		} else if (isPointInMapTriedPoint(pointToStrike)) {
 			System.out.println("Point found was already shoot and no boat was here. Look into opposite direction");
-			System.out.println("Point is: ");
-			System.out.println(pointToStrike.getPosDescription());
-			direction.getOppositeDirection();
-			return choosePointInAxe(pointToStrike, direction);
+			System.out.println("Point is: " + pointToStrike.getPosDescription());
+			Direction newDirection = Direction.getOppositeDirection(direction);
+			return choosePointInAxe(pointToStrike, newDirection);
 
 			// Si le point choisi est en dehors de la grille
 		} else if (!pointToStrike.isInThisGrid(GRID_SIZE)) {
 			System.out.println("Point found is out of grid. Look into opposite direction");
-			System.out.println("Point is: ");
-			System.out.println(pointToStrike.getPosDescription());
-			direction.getOppositeDirection();
-			return choosePointInAxe(pointToStrike, direction);
+			System.out.println("Point is: " + pointToStrike.getPosDescription());
+			Direction newDirection = Direction.getOppositeDirection(direction);
+			return choosePointInAxe(pointToStrike, newDirection);
 
 			// Et enfin, si le point choisi est encore complétement inconnu
 		} else {
 			System.out.println("Point found was never shoot, so we can try it.");
-			System.out.println("Point is: ");
-			System.out.println(pointToStrike.getPosDescription());
+			System.out.println("Point is: " + pointToStrike.getPosDescription());
 			return pointToStrike;
 		}
 	}
@@ -280,13 +404,13 @@ public final class Core {
 			throw new AllDirectionsTestedException();
 		}
 
-		int indexRandom = getRandomInt(0, notTriedDirectionInSinkModeList.size() - 1);
+		int indexRandom = Util.getRandomInt(0, notTriedDirectionInSinkModeList.size() - 1);
 		Direction direction = notTriedDirectionInSinkModeList.get(indexRandom);
 		pointToStrike = getPointFromThisPointAndDirection(firstPointTouchedWhenInSinkMode, direction);
 		// Au fur et à mesure de l'appel de cette fonction la Liste diminue.
 		notTriedDirectionInSinkModeList.remove(indexRandom);
 
-		if (!isPointInMapTriedPointAndIsPointTouched(pointToStrike) && pointToStrike.isInThisGrid(GRID_SIZE)) {
+		if (!isPointInMapTriedPoint(pointToStrike) && pointToStrike.isInThisGrid(GRID_SIZE)) {
 			System.out.println("Valid point found !");
 			return pointToStrike;
 		} else {
@@ -295,8 +419,8 @@ public final class Core {
 		}
 	}
 
-	private boolean isPointInMapTriedPointAndIsPointTouched(PointBean pointToSearch) {
-		for (PointBean point : triedPointAndIsPointTouchedMap.keySet()) {
+	private boolean isPointInMapTriedPoint(PointBean pointToSearch) {
+		for (PointBean point : triedPointAndPointWasBoatMap.keySet()) {
 			if (point.haveSamePosition(pointToSearch)) {
 				return true;
 			}
@@ -305,7 +429,7 @@ public final class Core {
 	}
 
 	private boolean isPointInMapAndWasABoat(PointBean pointToSearch) {
-		for (Map.Entry<PointBean, Boolean> entry : triedPointAndIsPointTouchedMap.entrySet()) {
+		for (Map.Entry<PointBean, Boolean> entry : triedPointAndPointWasBoatMap.entrySet()) {
 			if (entry.getKey().haveSamePosition(pointToSearch) && entry.getValue()) {
 				System.out.println("Find value point with true in map. Point is :");
 				System.out.println(entry.getKey().getPosDescription());
@@ -346,6 +470,7 @@ public final class Core {
 		} else {
 			throw new CantDeterminateAxeWithThisTwoPointsException(firstPoint, secondPoint);
 		}
+		System.out.println("Axe found is: " + axeOfBoatHunted.getAxeDescription());
 	}
 
 	private boolean isAxeVertical(PointBean firstPoint, PointBean secondPoint) {
@@ -356,10 +481,6 @@ public final class Core {
 		return (firstPoint.getAxeY() == secondPoint.getAxeY());
 	}
 
-	private int getRandomInt(int min, int max) {
-		return (int) (((Math.random() * max) - min) + min);
-	}
-
 	@Deprecated
 	private boolean isDirectionInDirectionList(Direction direction, List<Direction> list) {
 		for (Direction directionInList : list) {
@@ -368,6 +489,25 @@ public final class Core {
 			}
 		}
 		return false;
+	}
+
+	private void debugGetVisualGridOfPointTried() {
+
+		// On créé la représentation graphique de la grille
+		for (int x = 1; x <= GRID_SIZE; x++) {
+			String line = "";
+
+			for (int y = 1; y <= GRID_SIZE; y++) {
+				PointBean point = new PointBean(x, y);
+				if (isPointInMapTriedPoint(point)) {
+					line += " + ";
+				} else {
+					line += " - ";
+				}
+			}
+			System.out.println(line);
+		}
+		System.out.println("End of visual description");
 	}
 
 }

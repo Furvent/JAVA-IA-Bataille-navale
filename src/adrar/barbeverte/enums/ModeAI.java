@@ -12,4 +12,15 @@ public enum ModeAI {
 	public int getValue() {
 		return value;
 	}
+
+	public String getModeDescription() {
+		switch (value) {
+		case 0:
+			return "SEARCH";
+		case 1:
+			return "SINK";
+		default:
+			return "ERROR, NO MODE";
+		}
+	}
 }

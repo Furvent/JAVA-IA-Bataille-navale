@@ -6,6 +6,7 @@ import java.util.List;
 import adrar.barbeverte.BoatBean;
 import adrar.barbeverte.FleetBean;
 import adrar.barbeverte.PointBean;
+import adrar.barbeverte.Util;
 import adrar.barbeverte.enums.Direction;
 
 public final class FleetFactory {
@@ -77,7 +78,7 @@ public final class FleetFactory {
 	 */
 	private BoatBean createBoatAtThisPointWithThisSize(PointBean point, int newBoatSize) {
 		// Trouver une direction random et tester dans cette direction
-		Direction direction = Direction.values()[getRandomInt(0, 3)];
+		Direction direction = Direction.values()[Util.getRandomInt(0, 3)];
 		BoatBean newBoat = null;
 		int durectionTriedNumber = 0;
 		while ((durectionTriedNumber < 4) && (newBoat == null)) {
@@ -163,11 +164,7 @@ public final class FleetFactory {
 	}
 
 	private PointBean getRandomPoint() {
-		return new PointBean(getRandomInt(1, gridSize), getRandomInt(1, gridSize));
-	}
-
-	private int getRandomInt(int min, int max) {
-		return (int) ((Math.random() * max) + min);
+		return new PointBean(Util.getRandomInt(1, gridSize), Util.getRandomInt(1, gridSize));
 	}
 
 	private void addPointsOccupied(BoatBean boat) {

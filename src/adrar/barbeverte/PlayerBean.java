@@ -14,13 +14,15 @@ public final class PlayerBean {
 	private FleetBean fleet;
 	private Core ai;
 	private int score;
+	private String name;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-	public PlayerBean(Core ai) {
+	public PlayerBean(Core ai, String name) {
 		this.ai = ai;
 		score = 0;
+		this.name = name;
 	}
 
 	// ===========================================================
@@ -28,6 +30,14 @@ public final class PlayerBean {
 	// ===========================================================
 	public int getScore() {
 		return score;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 //	public void setScore(int score) {
@@ -57,6 +67,8 @@ public final class PlayerBean {
 		PointBean pointBean = null;
 		try {
 			pointBean = ai.dearIAGiveMeAPoint();
+		} catch (RuntimeException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -64,7 +76,7 @@ public final class PlayerBean {
 	}
 
 	public void getFeedbackAboutLastShoot(ShotFeedback feedback) {
-
+		ai.getFeedBackAboutPointSentToPlayer(feedback);
 	}
 
 	public void initAIData() {

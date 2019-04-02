@@ -31,8 +31,8 @@ public class BoatBean {
 	}
 
 	public boolean isSunk() {
-		for (boolean sunked : pointMap.values()) {
-			if (!sunked) {
+		for (boolean touched : pointMap.values()) {
+			if (!touched) {
 				return false;
 			}
 		}

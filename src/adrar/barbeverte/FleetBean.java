@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adrar.barbeverte.enums.ShotFeedback;
+import adrar.barbeverte.exceptions.AlreadyTouchedPointOnThisBoatException;
+import adrar.barbeverte.exceptions.WrongPointOnBoatTouchedException;
 
 public final class FleetBean {
 
@@ -30,6 +32,12 @@ public final class FleetBean {
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
+	/**
+	 * @deprecated
+	 * @param point
+	 * @return
+	 */
+	@Deprecated
 	public boolean isThereABoatAtThisPoint(PointBean point) {
 		for (BoatBean boat : boatList) {
 			if (boat.isAPointOfBoat(point)) {
@@ -43,21 +51,14 @@ public final class FleetBean {
 		for (BoatBean boat : boatList) {
 			if (boat.isAPointOfBoat(point) && !boat.isThisPointAlreadyTouched(point)) {
 				try {
-					boat.takeDamageAtThisPoint(point);
-					if (boat.isSunk()) {
-						boatList.re
-						return ShotFeedback.SUNK;
-					}
-					System.out.println("In Fleet : Boat Touched");
+					return inflictDamageAthThisBoatAtThisPoint(boat, point);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+
 			}
 		}
-	}
-
-	public void addBoat(BoatBean boat) {
-		boatList.add(boat);
+		return ShotFeedback.MISSED;
 	}
 
 	// ===========================================================
@@ -68,10 +69,6 @@ public final class FleetBean {
 			System.out.println("Boat : ");
 			System.out.println(boat.getListOfPointsDescription());
 		}
-	}
-
-	public int getSize() {
-		return boatList.size();
 	}
 
 	/*
@@ -100,6 +97,30 @@ public final class FleetBean {
 				}
 			}
 			System.out.println(line);
+		}
+	}
+
+	public void addBoat(BoatBean boat) {
+		boatList.add(boat);
+	}
+
+	public int getSize() {
+		return boatList.size();
+	}
+
+	private ShotFeedback inflictDamageAthThisBoatAtThisPoint(BoatBean boat, PointBean point)
+			throws AlreadyTouchedPointOnThisBoatException, WrongPointOnBoatTouchedException {
+		System.out.println("In Fleet : Boat Touched");
+		try {
+			boat.takeDamageAtThisPoint(point);
+			if (boat.isSunk()) {
+				boatList.remove(boat);
+				return ShotFeedback.SUNK;
+			} else {
+				return ShotFeedback.TOUCHED;
+			}
+		} catch (Exception e) {
+			throw e;
 		}
 	}
 
