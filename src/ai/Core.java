@@ -158,10 +158,13 @@ public final class Core {
 		PointBean pointToSend = new PointBean(Util.getRandomInt(1, GRID_SIZE), Util.getRandomInt(1, GRID_SIZE));
 		if (isPointInMapTriedPoint(pointToSend)) {
 			// DEBUG
+			System.out.println("Point choisi aléatoirement a déjà été touché, retour visuel pour debug: ");
 			debugGetVisualGridOfPointTried();
+			System.out.println("Un nouveau point aléatoire va être choisi.");
 			return debugGiveRandomePoint(numberOfTry);
 
 		} else {
+			System.out.println("Point aléatoire choisi : " + pointToSend.getPosDescription());
 			return pointToSend;
 		}
 	}
@@ -280,7 +283,7 @@ public final class Core {
 		if (thisPointIsAvailable(new PointBean(lastPointSentToPlayer.getAxeX(), smallerOrdinate - 1))) {
 			return new PointBean(lastPointSentToPlayer.getAxeX(), smallerOrdinate - 1);
 		} else if (thisPointIsAvailable(new PointBean(lastPointSentToPlayer.getAxeX(), higherOrdinate + 1))) {
-			return new PointBean(lastPointSentToPlayer.getAxeX(), smallerOrdinate + 1);
+			return new PointBean(lastPointSentToPlayer.getAxeX(), higherOrdinate + 1);
 		} else {
 			throw new bothPointAtExtrimityOfAxeVerticalAreInvalidException(smallerOrdinate, higherOrdinate);
 		}
@@ -322,7 +325,7 @@ public final class Core {
 	}
 
 	private boolean thisPointIsAvailable(PointBean point) {
-		return isPointInMapTriedPoint(point) || point.isInThisGrid(GRID_SIZE);
+		return !isPointInMapTriedPoint(point) && point.isInThisGrid(GRID_SIZE);
 	}
 
 	private int getHigherAbscissaFromTouchedPointOfHuntingBoat() {
@@ -351,10 +354,13 @@ public final class Core {
 	 * être créer une classe. Ou enlever la récursivité. Voir avec la fonction qui
 	 * appelle celle ci (continueToShootInAxeFound)
 	 *
+	 * @deprecated
+	 *
 	 * @param basePoint
 	 * @param direction
 	 * @return
 	 */
+	@Deprecated
 	private PointBean choosePointInAxe(PointBean basePoint, Direction direction) {
 		System.out.println("Je cherche un point dans cette direction : " + direction.getDirectionDescription());
 		PointBean pointToStrike = getPointFromThisPointAndDirection(basePoint, direction);
@@ -507,7 +513,7 @@ public final class Core {
 			}
 			System.out.println(line);
 		}
-		System.out.println("End of visual description");
+		System.out.println("Fin du debug visuel");
 	}
 
 }
