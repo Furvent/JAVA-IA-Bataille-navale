@@ -10,8 +10,8 @@ public class App {
 //		fleet.getGraphicRepresentation();
 
 		IArena arena = new IArena();
-		// arena.launchTest();
-		arena.debugLaunchTest();
+		arena.launchTest();
+		// arena.debugLaunchTest();
 //		for (int i = 0; i < 100; i++) {
 //			System.out.println(Util.getRandomInt(0, 3));
 //		}

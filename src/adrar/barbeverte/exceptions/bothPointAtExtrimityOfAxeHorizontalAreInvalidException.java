@@ -9,7 +9,6 @@ public class bothPointAtExtrimityOfAxeHorizontalAreInvalidException extends Exce
 	// ===========================================================
 	// Methods
 	// ===========================================================
-
 	private static final long serialVersionUID = 4L;
 
 	public bothPointAtExtrimityOfAxeHorizontalAreInvalidException(int firstExtremity, int lastExtremity) {
